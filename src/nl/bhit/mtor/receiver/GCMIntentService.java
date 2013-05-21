@@ -1,15 +1,18 @@
 package nl.bhit.mtor.receiver;
 
+import static nl.bhit.mtor.receiver.CommonUtilities.SENDER_ID;
+import static nl.bhit.mtor.receiver.CommonUtilities.displayMessage;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
-import static nl.bhit.mtor.receiver.CommonUtilities.SENDER_ID;
-import static nl.bhit.mtor.receiver.CommonUtilities.displayMessage;
 
 
 public class GCMIntentService extends GCMBaseIntentService{
@@ -38,7 +41,7 @@ public class GCMIntentService extends GCMBaseIntentService{
     @Override
     protected void onMessage(Context context, Intent intent) {
         Log.i(TAG, "Received message. Extras: " + intent.getExtras());
-        String message = getString(R.string.gcm_message) +" "+ intent.getStringExtra("test");
+        String message = getString(R.string.gcm_message) +" "+ intent.getStringExtra("message");
         displayMessage(context, message);
         // notifies user
         generateNotification(context, message);
@@ -79,17 +82,30 @@ public class GCMIntentService extends GCMBaseIntentService{
         long when = System.currentTimeMillis();
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(icon, message, when);
+      //Define sound URI
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
+        if(MainActivity.uri!=null){
+        	soundUri =MainActivity.uri; 
+        }
         String title = context.getString(R.string.app_name);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        .setSmallIcon(icon)
+        .setContentTitle(title)
+        .setContentText(message)
+        .setSound(soundUri); //This sets the sound to play
+        
+//        Notification notification = new Notification(icon, message, when);
+        
+        
         Intent notificationIntent = new Intent(context, MainActivity.class);
         // set intent so it does not start a new activity
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent intent =
                 PendingIntent.getActivity(context, 0, notificationIntent, 0);
-        notification.setLatestEventInfo(context, title, message, intent);
+/*        notification.setLatestEventInfo(context, title, message, intent);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notificationManager.notify(0, notification);
+*/        notificationManager.notify(0, mBuilder.build());
     }
 
 }

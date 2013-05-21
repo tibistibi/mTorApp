@@ -1,10 +1,21 @@
 package nl.bhit.mtor.receiver.model;
 
+import java.util.Date;
+
 public class ClientMessage {
 
 	private String content;
 	private String status;
 	private Long projectId;
+    private Date timestamp;
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
 	public String getContent() {
 		return content;

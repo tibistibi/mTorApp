@@ -47,47 +47,42 @@ public class DisplayMessageActivity extends Activity {
 		textView = createTextView();
 		setContentView(textView);
 		new RetrieveMessagesTask().execute("http://tomcat.bhit.nl/mTor/services/api/messages/2.json");
-
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MINUTE, 1);
-		Intent intent = new Intent(this, DisplayMessageActivity.class);
-		intent.putExtra("alarm_message", "O'Doyle Rules!");
-		// In reality, you would want to have a static variable for the request
-		// code instead of 192837
-		PendingIntent sender = PendingIntent.getBroadcast(this, 192837, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		// Get the AlarmManager service
-		AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-		am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), sender);
 	}
+
 	private ScrollView createTextView() {
 		ScrollView scrollView = new ScrollView(this);
 		TextView textView = new TextView(this);
 		textView.setTextSize(12);
 		textView.setText("temp message....");
 		scrollView.addView(textView);
-		return scrollView ;
+		return scrollView;
 	}
 
 	List<ClientMessage> messages;
+
 	private String getMessage(String url) {
 		messages = getContacts(url);
 		return "";
 	}
-	private TableLayout createTable(){
+
+	private TableLayout createTable() {
 		TableLayout table = new TableLayout(this);
 
 		TableRow.LayoutParams params1 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, 25);
 		TableRow.LayoutParams params2 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, 25);
 		TableRow.LayoutParams params3 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, 25);
+		TableRow.LayoutParams params5 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, 25);
 		TableRow row;
+		params2.leftMargin = 10;
+		params3.leftMargin = 10;
+		params5.leftMargin = 10;
 		row = new TableRow(this);
 		TableRow.LayoutParams params4 = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, 25);
-		params4.span=3;
-		params4.column=1;
+		params4.span = 3;
+		params4.column = 1;
 		row.addView(createTextView(params4, sdf.format(new Date())));
 		table.addView(row);
-		
+
 		if (messages == null) {
 			row = new TableRow(this);
 			row.addView(createTextView(params3, "nothing found"));
@@ -95,9 +90,10 @@ public class DisplayMessageActivity extends Activity {
 		}
 		for (ClientMessage clientMessage : messages) {
 			row = new TableRow(this);
-			row.addView(createTextView(params1, ""+clientMessage.getProjectId()));
+			row.addView(createTextView(params1, "" + clientMessage.getProjectId()));
 			row.addView(createTextView(params2, clientMessage.getStatus()));
-			row.addView(createTextView(params3, clientMessage.getContent()));
+			row.addView(createTextView(params3, sdf.format(clientMessage.getTimestamp())));
+			row.addView(createTextView(params5, clientMessage.getContent()));
 			table.addView(row);
 		}
 
@@ -107,7 +103,7 @@ public class DisplayMessageActivity extends Activity {
 	private TextView createTextView(TableRow.LayoutParams params, String text) {
 		TextView textView = new TextView(this);
 		textView.setLayoutParams(params);
-		textView.setTextSize(12);		
+		textView.setTextSize(12);
 		textView.setText(text);
 		return textView;
 	}
